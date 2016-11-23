@@ -16,7 +16,7 @@ namespace GoodReadsSharp.Models
         {
             Token = token;
             Secret = secret;
-            Id = null;
+            Id = "";
         }
     }
 }

@@ -23,7 +23,7 @@ namespace GoodReadsSharp
         {
             var request = new RestRequest("oauth/authorize");
             request.AddParameter("oauth_token", _userLogin.Token);
-            if(!String.IsNullOrEmpty(callbackUrl))
+            if (!String.IsNullOrEmpty(callbackUrl))
             {
                 request.AddParameter("oauth_callback", callbackUrl);
             }

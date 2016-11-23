@@ -6,13 +6,14 @@ using System.Threading.Tasks;
 using GoodReadsSharp.Models;
 using GoodReadsSharp.ResponseModel;
 using RestSharp;
+using System.Threading.Tasks;
 
 namespace GoodReadsSharp
 {
     public partial class GoodReadsClient
     {
         //Not working.
-        public Book BookIdForIsbn(String isbn, out Boolean success)
+        public async Task<Book> BookIdForIsbn(String isbn)
         {
             try
             {
@@ -25,28 +26,25 @@ namespace GoodReadsSharp
                 request.AddParameter("format", "xml");
                 //_restClient.AddHandler();
                 var response = _restClient.Execute<Book>(request);
-                
+
 
                 if (response.ResponseStatus == ResponseStatus.Error)
                 {
-                    success = false;
                     return null;
                 }
                 else
                 {
-                    success = true;
                     return response.Data;
                 }
-                
+
             }
             catch (Exception ex)
             {
-                success = false;
                 return null;
 
             }
 
-            
+
         }
 
 
@@ -55,7 +53,7 @@ namespace GoodReadsSharp
         /// Reviews the counts for isbns. Only populates the Id, Isbn and Isbn13 fields
         /// </summary>
         /// <param name="isbns">The isbns.</param>
-        public ReviewCountsForIsbns ReviewCountsForIsbns(List<String> isbns)
+        public async Task<ReviewCountsForIsbns> ReviewCountsForIsbns(List<String> isbns)
         {
             _restClient.BaseUrl = ApiBaseUrl;
             _restClient.Authenticator = PublicMethods();
@@ -69,5 +67,7 @@ namespace GoodReadsSharp
 
             return response.Data;
         }
+
+       // public async Task
     }
 }
