@@ -16,58 +16,97 @@ namespace GoodReadsConsole
         static void Main(string[] args)
         {
             DoStuff();
-
         }
 
         public static void DoStuff()
         {
-            var key = "eCFjwXhTpBagasFvhf6Sg";                                          // enter your API Key here
-            var secret = "lwqcOb8oTkkFE02nmRVWT2eSZeI1GsdAjQQK0Enuibc";                 // enter your API secret here
-            var client = new GoodReadsClient(key, secret);                              // creating a new Client object usig key and secret
-            var login = client.GetTokenAndBuildUrl();                                   // generates the url where the user authorizes the program
-            Process.Start(login);                                                       // opens the link
+            var key = System.Configuration.ConfigurationManager.AppSettings["key"];         // enter your API Key here
+            var secret = System.Configuration.ConfigurationManager.AppSettings["secret"];   // enter your API secret here
+            var client = new GoodReadsClient(key, secret);                                  // creating a new Client object usig key and secret
+            var login = client.GetTokenAndBuildUrl();                                       // generates the url where the user authorizes the program
+            Process.Start(login);                                                           // opens the link
 
             Console.WriteLine("Please hit Enter when you have accepted the request");
             Console.Read();
             var a = client.GetAccessToken();                                            // gets the access token for the current user
             client = new GoodReadsClient(key, secret, a.Token, a.Secret);               // updates the client object
             var accInfo = client.AccountInfo();                                         // Account object that where u can see information
-            Console.WriteLine("Name=" + accInfo.User.Name);
-            Console.WriteLine("Id=" + accInfo.User.Id);
-            Console.WriteLine("Link=" + accInfo.User.Link);
 
-            Console.WriteLine();
-            Console.WriteLine("Your shelves:");
-            Console.WriteLine();
-            var shelves = client.ListShelves();                                        // get all shelves created by the user
-            foreach (var item in shelves.Shelves)
+            while (true)
             {
-                Console.WriteLine("Shelf#" + shelves.Shelves.IndexOf(item).ToString() + ":");
-                Console.WriteLine("Name=" + item.Name);
-                Console.WriteLine("Count=" + item.BookCount);
-                Console.WriteLine("Description=" + item.Description);
-                Console.WriteLine();
+                Menu:
+                Console.Clear();
+                Console.WriteLine(@"---------------------------");
+                Console.WriteLine(@"[1] Lookup ISBN");
+                Console.WriteLine(@"[2] Search book");
+                Console.WriteLine(@"[3] Search author");
+                Console.WriteLine(@"[4] Show top 10");
+                Console.WriteLine(@"[5] Show your shelves");
+                Console.WriteLine(@"[Q] Quit");
+                Console.WriteLine(@"---------------------------");
+                var result = Console.ReadLine();
+
+                if (result == "")
+                {
+                    goto Menu;
+                }
+
+                if (result.ToLower() == "q")
+                {
+                    Environment.Exit(0);
+                }
+
+                switch (result)
+                {
+                    case "1":
+                        Console.Clear();
+                        Console.WriteLine("Enter ISBN:");
+                        var isbn = Console.ReadLine();
+                        var book = Task.Run(() => client.BookIdForIsbn(isbn)).Result;
+                        Console.WriteLine(@"---------------------------");
+                        Console.WriteLine($"Title: {book.Title}");
+
+                        if (book.Authors.Count > 1)
+                        {
+                            var i = 1;
+                            foreach (var variable in book.Authors)
+                            {
+                                Console.WriteLine($"{i}. Author: {variable.Name}");
+                                i++;
+                            }
+                        }
+                        else
+                        {
+                            Console.WriteLine($"Author: {book.Authors}");
+                        }
+
+                        Console.WriteLine($"Description: {book.Description}");
+                        Console.WriteLine(@"---------------------------");
+                        Console.ReadKey();
+                        break;
+
+                    case "2":
+                        Console.Clear();
+                        Console.WriteLine(@"---------------------------");
+                        Console.WriteLine("Enter title:");
+                        var title = Console.ReadLine();
+                        var bookList = Task.Run(() => client.SearchBook(title)).Result;
+
+                        Console.WriteLine();
+                        foreach (var variable in bookList)
+                        {
+                            Console.WriteLine(variable);
+                        }
+                        Console.WriteLine(@"---------------------------");
+                        Console.ReadKey();
+                        break;
+
+                    default:
+                        Console.WriteLine("\nInvalid input! Retry!");
+                        Console.ReadKey();
+                        goto Menu;
+                }
             }
-
-            var book = Task.Run(() => client.BookIdForIsbn("9788580572254")).Result;
-            Console.WriteLine(book.Title);
-            Console.WriteLine();
-            Console.WriteLine("Listing books on shelf 1");
-            Console.WriteLine();
-            var shelve = client.ListOwnedBooks();                                      // get all books owned by the user
-
-            foreach (var item in shelve.OwnedBooks)
-            {
-                Console.WriteLine("Title=" + item.Book.Title);
-                Console.WriteLine("Author=" + item.Book.Authors[0].Name);
-
-            }
-
-
-
-
-            Console.Read();
-            Console.ReadKey();
         }
     }
 }

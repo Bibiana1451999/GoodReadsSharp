@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -7,13 +8,15 @@ using GoodReadsSharp.Models;
 using GoodReadsSharp.ResponseModel;
 using RestSharp;
 using System.Threading.Tasks;
+using System.Xml;
+using System.Xml.Linq;
 
 namespace GoodReadsSharp
 {
     public partial class GoodReadsClient
     {
         //Not working.
-        public async Task<Book> BookIdForIsbn(String isbn)
+        public async Task<Book> BookIdForIsbn(string isbn)
         {
             try
             {
@@ -68,6 +71,57 @@ namespace GoodReadsSharp
             return response.Data;
         }
 
-       // public async Task
+        public async Task<List<string>> SearchBook(string searchString)
+        {
+            try
+            {
+                _restClient.BaseUrl = ApiBaseUrl;
+                _restClient.Authenticator = PublicMethods();
+
+                var request = new RestRequest("/search/index.xml", Method.GET);
+                request.AddParameter("q", searchString);
+                request.AddParameter("key", _apiKey);
+                request.AddParameter("format", "xml");
+                //_restClient.AddHandler();
+                var response = _restClient.Execute(request);
+                var responseAsXML = new XmlDocument();
+                responseAsXML.Load(GenerateStreamFromString(response.Content));
+                var authorList = responseAsXML.GetElementsByTagName("title");
+
+                var resultList = new List<string>();
+
+                foreach (XmlNode variable in authorList)
+                {
+                    resultList.Add(variable.InnerText);
+                }
+
+
+                if (response.ResponseStatus == ResponseStatus.Error)
+                {
+                    return null;
+                }
+                else
+                {
+                    return resultList;
+                }
+
+            }
+            catch (Exception ex)
+            {
+                return null;
+
+            }
+
+        }
+
+        public static Stream GenerateStreamFromString(string s)
+        {
+            var stream = new MemoryStream();
+            var writer = new StreamWriter(stream);
+            writer.Write(s);
+            writer.Flush();
+            stream.Position = 0;
+            return stream;
+        }
     }
 }
