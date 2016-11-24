@@ -15,7 +15,18 @@ namespace GoodReadsConsole
     {
         static void Main(string[] args)
         {
-            DoStuff();
+            try
+            {
+                Console.Title = "GoodReads client";
+                DoStuff();
+            }
+            catch (Exception)
+            {
+                Console.Clear();
+                Console.WriteLine("There was an error! Press any key to exit");
+                Console.ReadKey();
+                Environment.Exit(-1);
+            }
         }
 
         public static void DoStuff()
@@ -98,6 +109,7 @@ namespace GoodReadsConsole
                         {
                             Console.WriteLine(variable);
                         }
+                        Console.WriteLine("\nPress any key to return");
                         Console.WriteLine(@"---------------------------");
                         Console.ReadKey();
                         break;
@@ -105,7 +117,7 @@ namespace GoodReadsConsole
 
                         Console.Clear();
                         Console.WriteLine(@"---------------------------");
-                        Console.WriteLine($"Shelves of {accInfo.User.Name}");
+                        Console.WriteLine($"Shelves of {accInfo.User.Name}\n");
                         var shelf = new Shelf();
                         var booksOnShelfs = new ShelfReviewList();
 
@@ -117,14 +129,17 @@ namespace GoodReadsConsole
                             dict.Add(count, item);
                             count++;                   
                         }
-
-                        //TODO: Fix output
-
+                        
+                        Console.WriteLine("[B] Go back");
                         Console.WriteLine(@"---------------------------");
-                        Console.WriteLine("Enter shelf number:");
-
+                        Console.WriteLine("Enter option:");
 
                         var option = Console.ReadLine();
+
+                        if (option.ToLower() == "b")
+                        {
+                            goto Menu;
+                        }
 
                         if (!dict.ContainsKey(int.Parse(option)))
                         {
@@ -132,12 +147,19 @@ namespace GoodReadsConsole
                         }
                         else
                         {
+                            Console.Clear();
+                            Console.WriteLine(@"---------------------------");
+                            Console.WriteLine($"Books in shelf {dict[int.Parse(option)].Name}\n");
+
                             var booksOnShelf = Task.Run(()=>client.ListBooksOnSpecificShelf(dict[int.Parse(option)].Name)).Result;
 
                             foreach(var item in booksOnShelf)
                             {
                                 Console.WriteLine(item);
                             }
+
+                            Console.WriteLine("\nPress any key to return");
+                            Console.WriteLine(@"---------------------------");
                         }
 
                         Console.ReadKey();
