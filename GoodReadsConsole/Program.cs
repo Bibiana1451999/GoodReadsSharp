@@ -65,6 +65,7 @@ namespace GoodReadsConsole
                         var book = Task.Run(() => client.BookIdForIsbn(isbn)).Result;
                         Console.WriteLine(@"---------------------------");
                         Console.WriteLine($"Title: {book.Title}");
+                        Console.WriteLine();
 
                         if (book.Authors.Count > 1)
                         {
@@ -77,10 +78,13 @@ namespace GoodReadsConsole
                         }
                         else
                         {
-                            Console.WriteLine($"Author: {book.Authors}");
+                            Console.WriteLine($"Author: {book.Authors.First().Name}");
                         }
 
+                        Console.WriteLine();
                         Console.WriteLine($"Description: {book.Description}");
+                        Console.WriteLine();
+                        Console.WriteLine($"Number of pages: {book.NumPages}");
                         Console.WriteLine(@"---------------------------");
                         Console.ReadKey();
                         break;
@@ -91,11 +95,47 @@ namespace GoodReadsConsole
                         Console.WriteLine("Enter title:");
                         var title = Console.ReadLine();
                         var bookList = Task.Run(() => client.SearchBook(title)).Result;
+                        string[] arr = new string[25];
 
                         Console.WriteLine();
+                        int nm = 1;
                         foreach (var variable in bookList)
                         {
-                            Console.WriteLine(variable);
+                            if (variable.ToLower().Contains(title.ToLower()))
+                            {
+                                Console.WriteLine(nm + "." + variable);
+                                arr[nm] = variable;
+                                nm++;
+                             //   Console.WriteLine(bookList.ElementAt<Book>(nm).);
+                            }
+                        }
+                        Console.WriteLine(@"---------------------------");
+                        Console.WriteLine("Choose the number of the book you want");
+                        string numb = Console.ReadLine();
+                        Console.Clear();
+                        Console.WriteLine(arr[Convert.ToInt16(numb)]);
+                        
+                        Console.ReadKey();
+                        break;
+
+                    case "3":
+                        Console.Clear();
+                        Console.WriteLine(@"---------------------------");
+                        Console.WriteLine("Enter name:");
+                        var name = Console.ReadLine();
+                        var authList = Task.Run(() => client.SearchAuthors(name)).Result;
+                        
+
+                        Console.WriteLine();
+                        int num = 1;
+                        foreach (var variable in authList)
+                        {
+                            String input = new String(variable.Where(c => c != '-' && (c < '0' || c > '9')).ToArray());
+                            if (variable.ToLower().Contains(name.ToLower()))
+                            {
+                                Console.WriteLine(num + "." + input);
+                                num++;
+                            }
                         }
                         Console.WriteLine(@"---------------------------");
                         Console.ReadKey();

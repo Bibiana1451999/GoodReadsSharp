@@ -50,8 +50,6 @@ namespace GoodReadsSharp
 
         }
 
-
-
         /// <summary>
         /// Reviews the counts for isbns. Only populates the Id, Isbn and Isbn13 fields
         /// </summary>
@@ -89,10 +87,11 @@ namespace GoodReadsSharp
                 var authorList = responseAsXML.GetElementsByTagName("title");
 
                 var resultList = new List<string>();
-
+                
                 foreach (XmlNode variable in authorList)
                 {
-                    resultList.Add(variable.InnerText);
+                    if (!resultList.Contains(variable.InnerText))
+                        resultList.Add(variable.InnerText);
                 }
 
 
@@ -113,6 +112,8 @@ namespace GoodReadsSharp
             }
 
         }
+
+        
 
         public static Stream GenerateStreamFromString(string s)
         {
