@@ -79,7 +79,7 @@ namespace GoodReadsSharp
             var request = new RestRequest("api/auth_user ", Method.GET);
             var response = _restClient.Execute<AuthUser>(request);
 
-            _userLogin.Id = response.Data.User.Id;
+            //_userLogin.Id = response.Data.User.Id;
             return response.Data;
         }
 

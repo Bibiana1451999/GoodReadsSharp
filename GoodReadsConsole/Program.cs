@@ -42,9 +42,10 @@ namespace GoodReadsConsole
                 Console.WriteLine(@"[3] Search author");
                 Console.WriteLine(@"[4] Show top 10");
                 Console.WriteLine(@"[5] Show your shelves");
+                Console.WriteLine(@"[6] Show your acoount information");
                 Console.WriteLine(@"[Q] Quit");
                 Console.WriteLine(@"---------------------------");
-                var result = Console.ReadLine();
+                 var result = Console.ReadLine();
 
                 if (result == "")
                 {
@@ -100,8 +101,50 @@ namespace GoodReadsConsole
                         Console.WriteLine(@"---------------------------");
                         Console.ReadKey();
                         break;
+                    case "6":
 
+                        Console.Clear();
+                        Console.WriteLine(@"---------------------------");
+                        Console.WriteLine($"Shelves of {accInfo.User.Name}");
+                        var shelf = new Shelf();
+                        var booksOnShelfs = new ShelfReviewList();
+
+                        var count = 1;
+                        var dict = new Dictionary<int, UserShelf>();
+                        foreach (var item in client.ListShelves().Shelves)
+                        {
+                            Console.WriteLine($"[{count}] {item.Name}");
+                            dict.Add(count, item);
+                            count++;                   
+                        }
+
+                        //TODO: Fix output
+
+                        Console.WriteLine(@"---------------------------");
+                        Console.WriteLine("Enter shelf number:");
+
+
+                        var option = Console.ReadLine();
+
+                        if (!dict.ContainsKey(int.Parse(option)))
+                        {
+                            goto error;
+                        }
+                        else
+                        {
+                            var booksOnShelf = Task.Run(()=>client.ListBooksOnSpecificShelf(dict[int.Parse(option)].Name)).Result;
+
+                            foreach(var item in booksOnShelf)
+                            {
+                                Console.WriteLine(item);
+                            }
+                        }
+
+                        Console.ReadKey();
+                        
+                        break;
                     default:
+                        error:
                         Console.WriteLine("\nInvalid input! Retry!");
                         Console.ReadKey();
                         goto Menu;
