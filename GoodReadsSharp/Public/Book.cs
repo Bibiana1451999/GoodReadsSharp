@@ -50,6 +50,41 @@ namespace GoodReadsSharp
 
         }
 
+        public async Task<List<string>> ListBooksOnSpecificShelf (string shelfname)
+        {
+            _restClient.BaseUrl = ApiBaseUrl;
+            _restClient.Authenticator = PublicMethods();
+
+            var request = new RestRequest("/review/list/61708912.xml", Method.GET);
+            request.AddParameter("format", "xml");
+            request.AddParameter("key", _apiKey);
+            request.AddParameter("shelf", shelfname);
+
+            var response = _restClient.Execute<ReviewCountsForIsbns>(request);
+
+            var responseAsXML = new XmlDocument();
+            responseAsXML.Load(GenerateStreamFromString(response.Content));
+            var authorList = responseAsXML.GetElementsByTagName("title");
+
+            var resultList = new List<string>();
+
+            foreach (XmlNode variable in authorList)
+            {
+                resultList.Add(variable.InnerText);
+            }
+
+
+            if (response.ResponseStatus == ResponseStatus.Error)
+            {
+                return null;
+            }
+            else
+            {
+                return resultList;
+            }
+        }
+
+
         /// <summary>
         /// Reviews the counts for isbns. Only populates the Id, Isbn and Isbn13 fields
         /// </summary>
@@ -87,11 +122,10 @@ namespace GoodReadsSharp
                 var authorList = responseAsXML.GetElementsByTagName("title");
 
                 var resultList = new List<string>();
-                
+
                 foreach (XmlNode variable in authorList)
                 {
-                    if (!resultList.Contains(variable.InnerText))
-                        resultList.Add(variable.InnerText);
+                    resultList.Add(variable.InnerText);
                 }
 
 
@@ -112,8 +146,6 @@ namespace GoodReadsSharp
             }
 
         }
-
-        
 
         public static Stream GenerateStreamFromString(string s)
         {

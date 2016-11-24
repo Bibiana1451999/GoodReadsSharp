@@ -16,17 +16,11 @@ namespace GoodReadsSharp
         /// Lists shelves for a user 
         /// </summary>
         /// <param name="page">The page.</param>
-        public ListShelves ListShelves(Int32 page = 1)
+        public ListShelves ListShelves()
         {
 
             var request = new RestRequest("shelf/list.xml", Method.GET);
-            request.AddParameter("user_id", _userLogin.Id);
-
-            if(page>1)
-            {
-                request.AddParameter("page", page);
-            }
-
+            request.AddParameter("key", _apiKey);
 
             var response = _restClient.Execute<ListShelves>(request);
             return response.Data;

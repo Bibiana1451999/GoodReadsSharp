@@ -15,7 +15,18 @@ namespace GoodReadsConsole
     {
         static void Main(string[] args)
         {
-            DoStuff();
+            try
+            {
+                Console.Title = "GoodReads client";
+                DoStuff();
+            }
+            catch (Exception)
+            {
+                Console.Clear();
+                Console.WriteLine("There was an error! Press any key to exit");
+                Console.ReadKey();
+                Environment.Exit(-1);
+            }
         }
 
         public static void DoStuff()
@@ -42,9 +53,10 @@ namespace GoodReadsConsole
                 Console.WriteLine(@"[3] Search author");
                 Console.WriteLine(@"[4] Show top 10");
                 Console.WriteLine(@"[5] Show your shelves");
+                Console.WriteLine(@"[6] Show your acoount information");
                 Console.WriteLine(@"[Q] Quit");
                 Console.WriteLine(@"---------------------------");
-                var result = Console.ReadLine();
+                 var result = Console.ReadLine();
 
                 if (result == "")
                 {
@@ -137,11 +149,64 @@ namespace GoodReadsConsole
                                 num++;
                             }
                         }
+                        Console.WriteLine("\nPress any key to return");
                         Console.WriteLine(@"---------------------------");
                         Console.ReadKey();
                         break;
+                    case "6":
 
+                        Console.Clear();
+                        Console.WriteLine(@"---------------------------");
+                        Console.WriteLine($"Shelves of {accInfo.User.Name}\n");
+                        var shelf = new Shelf();
+                        var booksOnShelfs = new ShelfReviewList();
+
+                        var count = 1;
+                        var dict = new Dictionary<int, UserShelf>();
+                        foreach (var item in client.ListShelves().Shelves)
+                        {
+                            Console.WriteLine($"[{count}] {item.Name}");
+                            dict.Add(count, item);
+                            count++;                   
+                        }
+                        
+                        Console.WriteLine("[B] Go back");
+                        Console.WriteLine(@"---------------------------");
+                        Console.WriteLine("Enter option:");
+
+                        var option = Console.ReadLine();
+
+                        if (option.ToLower() == "b")
+                        {
+                            goto Menu;
+                        }
+
+                        if (!dict.ContainsKey(int.Parse(option)))
+                        {
+                            goto error;
+                        }
+                        else
+                        {
+                            Console.Clear();
+                            Console.WriteLine(@"---------------------------");
+                            Console.WriteLine($"Books in shelf {dict[int.Parse(option)].Name}\n");
+
+                            var booksOnShelf = Task.Run(()=>client.ListBooksOnSpecificShelf(dict[int.Parse(option)].Name)).Result;
+
+                            foreach(var item in booksOnShelf)
+                            {
+                                Console.WriteLine(item);
+                            }
+
+                            Console.WriteLine("\nPress any key to return");
+                            Console.WriteLine(@"---------------------------");
+                        }
+
+                        Console.ReadKey();
+                        
+                        break;
                     default:
+                        error:
                         Console.WriteLine("\nInvalid input! Retry!");
                         Console.ReadKey();
                         goto Menu;

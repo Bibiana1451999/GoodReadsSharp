@@ -14,6 +14,12 @@ namespace GoodReadsSharp
 {
     public partial class GoodReadsClient
     {
+
+        public GoodReadsClient(String name){
+            this.name = name;
+        }
+        public String name { get; set; }
+
         private const string ApiBaseUrl = @"http://www.goodreads.com";
 
         private UserLogin _userLogin { get; set; }
