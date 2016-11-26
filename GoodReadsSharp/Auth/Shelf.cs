@@ -28,7 +28,6 @@ namespace GoodReadsSharp
 
         public void AddShelf(String shelfName)
         {
-            shelfName = shelfName.ToLower();
 
             var request = new RestRequest("user_shelves.xml", Method.POST);
             request.AddParameter("user_shelf[name]", shelfName);
@@ -53,7 +52,6 @@ namespace GoodReadsSharp
         /// </summary>
         public Shelf AddBookToShelf(String shelfName, String bookId)
         {
-            shelfName = shelfName.ToLower();
 
             var request = new RestRequest("shelf/add_to_shelf.xml", Method.POST);
             request.AddParameter("name", shelfName);
@@ -82,11 +80,11 @@ namespace GoodReadsSharp
         /// </summary>
         /// <param name="shelfName">Name of the shelf.</param>
         /// <param name="page">The page.</param>
-        public ListBooksOnShelf ListBooksOnShelf(String shelfName, Int32 page = 1)
+        public List<Book> ListBooksOnShelf(String shelfName, Int32 page = 1)
         {
-            shelfName = shelfName.ToLower(); //Unfortunately the review/list api is case sensitive even though none of the other shelf api's are. Just to keep it consistent we've called toLower on all other shelfName parameters. 
+            //Unfortunately the review/list api is case sensitive even though none of the other shelf api's are. Just to keep it consistent we've called toLower on all other shelfName parameters. 
 
-            var request = new RestRequest("review/list", Method.GET);
+            var request = new RestRequest("shelf/list.xml", Method.GET);
             request.AddParameter("v", "2");
             request.AddParameter("id", _userLogin.Id);
             request.AddParameter("shelf", shelfName);
@@ -97,8 +95,10 @@ namespace GoodReadsSharp
                 request.AddParameter("page", page);
             }
 
-            var response = _restClient.Execute<ListBooksOnShelf>(request);
-            return response.Data;
+            var response = _restClient.Execute<Book>(request);
+            var listOfBooks = new List<Book>();
+            listOfBooks.Add(response.Data);
+            return listOfBooks;
         }
 
         
