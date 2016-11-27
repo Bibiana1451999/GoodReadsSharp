@@ -15,7 +15,7 @@ namespace GoodReadsSharp
 {
     public partial class GoodReadsClient
     {
-        //Not working.
+        
         public async Task<Book> BookIdForIsbn(string isbn)
         {
             try
@@ -156,5 +156,8 @@ namespace GoodReadsSharp
             stream.Position = 0;
             return stream;
         }
+
+    
+
     }
 }
