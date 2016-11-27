@@ -42,7 +42,7 @@ namespace GoodReadsConsole
             var a = client.GetAccessToken();                                            // gets the access token for the current user
             client = new GoodReadsClient(key, secret, a.Token, a.Secret);               // updates the client object
             var accInfo = client.AccountInfo();                                         // Account object that where u can see information
-
+            
             while (true)
             {
                 Menu:
@@ -52,7 +52,7 @@ namespace GoodReadsConsole
                 Console.WriteLine(@"[2] Search book");
                 Console.WriteLine(@"[3] Search author");
                 Console.WriteLine(@"[4] Show top 10");
-                Console.WriteLine(@"[5] Show your shelves");
+                Console.WriteLine(@"[5] Add a Shelf");
                 Console.WriteLine(@"[6] Show your acoount information");
                 Console.WriteLine(@"[Q] Quit");
                 Console.WriteLine(@"---------------------------");
@@ -62,7 +62,7 @@ namespace GoodReadsConsole
                 {
                     goto Menu;
                 }
-
+                
                 if (result.ToLower() == "q")
                 {
                     Environment.Exit(0);
@@ -74,7 +74,13 @@ namespace GoodReadsConsole
                         Console.Clear();
                         Console.WriteLine("Enter ISBN:");
                         var isbn = Console.ReadLine();
+
+                        if (isbn.ToLower() == "b")
+                            goto Menu;
+
                         var book = Task.Run(() => client.BookIdForIsbn(isbn)).Result;
+                        if(book.Title=="")
+                            Console.WriteLine("There is no book with that ISBN, press Enter to go back!");
                         Console.WriteLine(@"---------------------------");
                         Console.WriteLine($"Title: {book.Title}");
                         Console.WriteLine();
@@ -106,10 +112,17 @@ namespace GoodReadsConsole
                         Console.WriteLine(@"---------------------------");
                         Console.WriteLine("Enter title:");
                         var title = Console.ReadLine();
+
+                        if (title.ToLower() == "b")
+                            goto Menu;
+
                         var bookList = Task.Run(() => client.SearchBook(title)).Result;
                         string[] arr = new string[25];
 
                         Console.WriteLine();
+
+                        
+
                         int nm = 1;
                         foreach (var variable in bookList)
                         {
@@ -118,14 +131,40 @@ namespace GoodReadsConsole
                                 Console.WriteLine(nm + "." + variable);
                                 arr[nm] = variable;
                                 nm++;
-                             //   Console.WriteLine(bookList.ElementAt<Book>(nm).);
+                                //   Console.WriteLine(bookList.ElementAt<Book>(nm).);
                             }
                         }
+
                         Console.WriteLine(@"---------------------------");
                         Console.WriteLine("Choose the number of the book you want");
                         string numb = Console.ReadLine();
                         Console.Clear();
-                        Console.WriteLine(arr[Convert.ToInt16(numb)]);
+                        // Console.WriteLine(arr[Convert.ToInt16(numb)]);
+
+                        var bookie = Task.Run(() => client.BookIdForTitle(arr[Convert.ToInt16(numb)])).Result;
+                        Console.WriteLine(@"---------------------------");
+                        Console.WriteLine($"Title: {bookie.Title}");
+                        Console.WriteLine();
+
+                        if (bookie.Authors.Count > 1)
+                        {
+                            var i = 1;
+                            foreach (var variable in bookie.Authors)
+                            {
+                                Console.WriteLine($"{i}. Author: {variable.Name}");
+                                i++;
+                            }
+                        }
+                        else
+                        {
+                            Console.WriteLine($"Author: {bookie.Authors.First().Name}");
+                        }
+
+                        Console.WriteLine();
+                        Console.WriteLine($"Description: {bookie.Description}");
+                        Console.WriteLine();
+                        Console.WriteLine($"Number of pages: {bookie.NumPages}");
+                        Console.WriteLine(@"---------------------------");
                         
                         Console.ReadKey();
                         break;
@@ -135,8 +174,13 @@ namespace GoodReadsConsole
                         Console.WriteLine(@"---------------------------");
                         Console.WriteLine("Enter name:");
                         var name = Console.ReadLine();
+
+                        if (name.ToLower() == "b")
+                            goto Menu;
+
                         var authList = Task.Run(() => client.SearchAuthors(name)).Result;
-                        
+                        string[] arr2 = new string[25];
+
 
                         Console.WriteLine();
                         int num = 1;
@@ -146,13 +190,29 @@ namespace GoodReadsConsole
                             if (variable.ToLower().Contains(name.ToLower()))
                             {
                                 Console.WriteLine(num + "." + input);
+                                arr2[num] = input;
                                 num++;
                             }
                         }
-                        Console.WriteLine("\nPress any key to return");
-                        Console.WriteLine(@"---------------------------");
+
                         Console.ReadKey();
                         break;
+
+
+                    case "5":
+
+                        Console.Clear();
+                        Console.WriteLine(@"---------------------------");
+                        Console.WriteLine("Write the name of the shelf");
+                        var shelfName = Console.ReadLine();
+
+                        client.AddShelf(shelfName);
+                        Console.WriteLine(@"---------------------------");
+                        Console.WriteLine("Shelf created, go back and check all your shelves [6]");
+
+                        Console.ReadKey();
+                        goto Menu;
+                                            
                     case "6":
 
                         Console.Clear();
@@ -169,7 +229,7 @@ namespace GoodReadsConsole
                             dict.Add(count, item);
                             count++;                   
                         }
-                        
+
                         Console.WriteLine("[B] Go back");
                         Console.WriteLine(@"---------------------------");
                         Console.WriteLine("Enter option:");

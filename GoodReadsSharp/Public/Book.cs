@@ -50,6 +50,40 @@ namespace GoodReadsSharp
 
         }
 
+        public async Task<Book> BookIdForTitle(string title)
+        {
+            try
+            {
+                _restClient.BaseUrl = ApiBaseUrl;
+                _restClient.Authenticator = PublicMethods();
+
+                var request = new RestRequest("book/title", Method.GET);
+                request.AddParameter("title", title);
+                request.AddParameter("key", _apiKey);
+                request.AddParameter("format", "xml");
+                //_restClient.AddHandler();
+                var response = _restClient.Execute<Book>(request);
+
+
+                if (response.ResponseStatus == ResponseStatus.Error)
+                {
+                    return null;
+                }
+                else
+                {
+                    return response.Data;
+                }
+
+            }
+            catch (Exception ex)
+            {
+                return null;
+
+            }
+
+
+        }
+
         public async Task<List<string>> ListBooksOnSpecificShelf (string shelfname)
         {
             _restClient.BaseUrl = ApiBaseUrl;
