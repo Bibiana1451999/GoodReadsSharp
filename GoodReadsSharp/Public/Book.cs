@@ -15,7 +15,7 @@ namespace GoodReadsSharp
 {
     public partial class GoodReadsClient
     {
-        
+
         public async Task<Book> BookIdForIsbn(string isbn)
         {
             try
@@ -84,7 +84,7 @@ namespace GoodReadsSharp
 
         }
 
-        public async Task<List<string>> ListBooksOnSpecificShelf (string shelfname,string userid)
+        public async Task<List<string>> ListBooksOnSpecificShelf(string shelfname, string userid)
         {
             _restClient.BaseUrl = ApiBaseUrl;
             _restClient.Authenticator = PublicMethods();
@@ -192,7 +192,9 @@ namespace GoodReadsSharp
             return stream;
         }
 
-    
+
+
+
 
     }
 }

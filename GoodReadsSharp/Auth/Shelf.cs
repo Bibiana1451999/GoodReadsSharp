@@ -22,7 +22,6 @@ namespace GoodReadsSharp
             var request = new RestRequest("shelf/list.xml", Method.GET);
             request.AddParameter("key", _apiKey);
             request.AddParameter("user_id", userid);
-
             var response = _restClient.Execute<ListShelves>(request);
             return response.Data;
         }
