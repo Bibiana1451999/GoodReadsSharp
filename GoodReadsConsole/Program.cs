@@ -53,7 +53,7 @@ namespace GoodReadsConsole
                 Console.WriteLine(@"[3] Search author");
                 Console.WriteLine(@"[4] Show top 10");
                 Console.WriteLine(@"[5] Add a Shelf");
-                Console.WriteLine(@"[6] Show your acoount information");
+                Console.WriteLine(@"[6] List shelves");
                 Console.WriteLine(@"[Q] Quit");
                 Console.WriteLine(@"---------------------------");
                  var result = Console.ReadLine();
@@ -223,7 +223,7 @@ namespace GoodReadsConsole
 
                         var count = 1;
                         var dict = new Dictionary<int, UserShelf>();
-                        foreach (var item in client.ListShelves().Shelves)
+                        foreach (var item in client.ListShelves(accInfo.User.Id).Shelves)
                         {
                             Console.WriteLine($"[{count}] {item.Name}");
                             dict.Add(count, item);
@@ -251,7 +251,7 @@ namespace GoodReadsConsole
                             Console.WriteLine(@"---------------------------");
                             Console.WriteLine($"Books in shelf {dict[int.Parse(option)].Name}\n");
 
-                            var booksOnShelf = Task.Run(()=>client.ListBooksOnSpecificShelf(dict[int.Parse(option)].Name)).Result;
+                            var booksOnShelf = Task.Run(()=>client.ListBooksOnSpecificShelf(dict[int.Parse(option)].Name, accInfo.User.Id)).Result;
 
                             foreach(var item in booksOnShelf)
                             {
