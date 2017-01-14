@@ -41,8 +41,10 @@ namespace GoodReadsSharp.Models
         public String PublicationMonth { get; set; }
         public String AverageRating { get; set; }
         public String Description { get; set; }
+       
 
-      
+
+
 
     }
 }

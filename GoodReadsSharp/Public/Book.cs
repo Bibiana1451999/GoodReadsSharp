@@ -15,7 +15,7 @@ namespace GoodReadsSharp
 {
     public partial class GoodReadsClient
     {
-        //Not working.
+
         public async Task<Book> BookIdForIsbn(string isbn)
         {
             try
@@ -84,15 +84,16 @@ namespace GoodReadsSharp
 
         }
 
-        public async Task<List<string>> ListBooksOnSpecificShelf (string shelfname)
+        public async Task<List<string>> ListBooksOnSpecificShelf(string shelfname, string userid)
         {
             _restClient.BaseUrl = ApiBaseUrl;
             _restClient.Authenticator = PublicMethods();
 
-            var request = new RestRequest("/review/list/61708912.xml", Method.GET);
-            request.AddParameter("format", "xml");
+            var request = new RestRequest("/review/list", Method.GET);
+            request.AddParameter("v", "2");
             request.AddParameter("key", _apiKey);
             request.AddParameter("shelf", shelfname);
+            request.AddParameter("id", userid);
 
             var response = _restClient.Execute<ReviewCountsForIsbns>(request);
 
@@ -190,5 +191,10 @@ namespace GoodReadsSharp
             stream.Position = 0;
             return stream;
         }
+
+
+
+
+
     }
 }
